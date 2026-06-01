@@ -3,15 +3,10 @@
 /* TODO:Stencil kernal to multiply two matrices of any compatible size */
 void multiM(struct inputPair p) {
     // Placeholder 3-loop matrix multiplication logic
-
     for (int i = 0; i < r1; ++i) {
         for (int j = 0; j < c2; ++j) {
             for (int k = 0; k < c1; ++k) {
-                #if ROW_MAJOR == 1
-                    p->res[i * p->c2 + j] += p->m1[i * p->c1 + k] * p->m2[k * p->c2 + j];
-                #else
-                    p->res[j * p->r1 + i] += p->m1[k * p->r1 + i] * p->m2[j * p->c1 + k];
-                #endif
+                //p->res[i * p->c2 + j] += p->m1[i * p->c1 + k] * p->m2[k * p->c2 + j];
             }
         }
     }
@@ -198,14 +193,14 @@ void produceInputPair(char* file, int nCons){
                 }
 
                 // Get columns in row.
-                char *temp = strtok(line, " ");
+                char *token = strtok(line, " ");
                 for (int j = 0; j < p->c1; j++){
-                    if (temp == NULL) {
+                    if (token == NULL) {
                         printf("Invalid matrix specifications.\n");
                         exit(1);
                     }
-                    p->m1[i * p->c1 + j] = atoi(temp);
-                    temp = strtok(NULL, " ");
+                    p->m1[i * p->c1 + j] = atoi(token);
+                    token = strtok(NULL, " ");
                 }
 
             }
@@ -230,14 +225,14 @@ void produceInputPair(char* file, int nCons){
                 }
 
                 // Get columns in row.
-                char *temp = strtok(line, " ");
+                char *token = strtok(line, " ");
                 for (int j = 0; j < p->c2; j++){
-                    if (temp == NULL) {
+                    if (token == NULL) {
                         printf("Invalid matrix specifications.\n");
                         exit(1);
                     }
-                    p->m2[j * p->r2 + i] = atoi(temp);
-                    temp = strtok(NULL, " ");
+                    p->m2[j * p->r2 + i] = atoi(token);
+                    token = strtok(NULL, " ");
                 }
 
             }
@@ -259,8 +254,7 @@ void produceInputPair(char* file, int nCons){
 
     // Add termination signal for each consumer into buffer.
     struct inputPair *term = malloc(sizeof(inputPair));
-    term->r1,term->c1,term->r2,term->c2 = -1;
-    term->m1,term->m2,term->res = NULL;
+    term->r1 = -1;
     for (int i = 0; i < nCons < i++) bufferAdd(term);
 
 }
