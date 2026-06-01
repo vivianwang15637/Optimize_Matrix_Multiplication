@@ -2,7 +2,7 @@
 
 struct buffer b;
 
-/* TODO:Stencil kernal to multiply two matrices of any compatible size */
+/* Cache/memory access optimized matrix multiplication.*/
 void multiM(struct inputPair *p) {
     // Placeholder 3-loop matrix multiplication logic
     for (int i = 0; i < p->r1; ++i) {
@@ -100,31 +100,38 @@ void freeInputPair(struct inputPair *p){
 /* Print resulting matrix and corresponding inputs */
 void printToFile (struct inputPair *p){
     pthread_mutex_lock(&b.print_m);
-    
-    printf("\nInput Matrix 1:\n");
+    char *outFile = strncat(outFile, b.fileIn, 10);
+    FILE *fp = fopen(outFile, "a");
+    if (fp == NULL) {
+        printf("Error: Could not open file.\n");
+        exit(1);
+    }
+
+    fprintf(fp,"\nInput Matrix 1:\n");
     for (int i = 0; i < p->r1; ++i) {
         for (int j = 0; j < p->c1; ++j){
-            printf("%d  ", p->m1[i * p->c1 + j]);       /* Row major ordering */
+            fprintf(fp,"%d  ", p->m1[i * p->c1 + j]);       /* Row major ordering */
         }
-        printf("\n");
+        fprintf(fp,"\n");
     }
 
-    printf("Input Matrix 2:\n");
+    fprintf(fp,"Input Matrix 2:\n");
     for (int i = 0; i < p->r2; ++i) {
         for (int j = 0; j < p->c2; ++j){
-            printf("%d  ", p->m2[j * p->r2 + i]);       /* Column major ordering */
+            fprintf(fp,"%d  ", p->m2[j * p->r2 + i]);       /* Column major ordering */
         }
-        printf("\n");
+        fprintf(fp,"\n");
     }
 
-    printf("Resultant Matrix:\n");
+    fprintf(fp,"Resultant Matrix:\n");
     for (int i = 0; i < p->r1; ++i) {
         for (int j = 0; j < p->c2; ++j){
-            printf("%d  ", p->res[i * p->c2 + j]);      /* Row major ordering */
+            fprintf(fp,"%d  ", p->res[i * p->c2 + j]);      /* Row major ordering */
         }
-        printf("\n");
+        fprintf(fp,"\n");
     }
 
+    fclose(fp);
     pthread_mutex_unlock(&b.print_m);
 }
 
@@ -303,10 +310,10 @@ void startMultiM(int nCon, char *fileName){
 }
 
 /*
- * This program aims to optimize execution of mutiple matrix mutiplication operations requested via
+ * This testing program aims to optimize execution of mutiple matrix mutiplication operations requested via
  * input file. The number of threads launching kernels/multiplying matricies must be specified via
  * command line argument as the 3rd argument (if 0, the default value of 1 will be used). Matrix inputs
- * must be integer matricies.
+ * must be integer matricies. This implementation optimizes matrix multiplication via multithreading.
  */
 int main(int argc, char **argv) {
     // Check args.
