@@ -8,8 +8,6 @@
 
 #define BUFFER_SIZE 10
 #define MAX_LINE_SIZE 100
-#define ROW_MAJOR 1                         /* Change to 0 if your memory is column major. Column major ordering can be slower than row major */
-
 
 struct inputPair{
     int r1,c1,r2,c2;
@@ -47,6 +45,6 @@ void *consumeInputPair(void *cons_num);
 void freeInputPair(struct inputPair *p);
 void printToFile (struct inputPair *p);
 
-void startMultiM(int argc, char **argv);
+void startMultiM(int nCon, char *fileName);
 
 # endif

@@ -107,11 +107,7 @@ void printToFile (struct inputPair *p){
     printf("\nInput Matrix 1:\n");
     for (int i = 0; i < p->r1; ++i) {
         for (int j = 0; j < p->c1; ++j){
-            #if ROW_MAJOR == 1
-                printf("%d  ", p->m1[i * p->c1 + j]);
-            #else
-                printf("%d  ", p->m1[j * p->r1 + i]);
-            #endif
+            printf("%d  ", p->m1[i * p->c1 + j]);       /* Row major ordering */
         }
         printf("\n");
     }
@@ -119,11 +115,7 @@ void printToFile (struct inputPair *p){
     printf("Input Matrix 2:\n");
     for (int i = 0; i < p->r2; ++i) {
         for (int j = 0; j < p->c2; ++j){
-            #if ROW_MAJOR == 1
-                printf("%d  ", p->m2[i * p->c2 + j]);
-            #else
-                printf("%d  ", p->m2[j * p->r2 + i]);
-            #endif
+            printf("%d  ", p->m2[j * p->r2 + i]);       /* Column major ordering */
         }
         printf("\n");
     }
@@ -131,11 +123,7 @@ void printToFile (struct inputPair *p){
     printf("Resultant Matrix:\n");
     for (int i = 0; i < p->r1; ++i) {
         for (int j = 0; j < p->c2; ++j){
-            #if ROW_MAJOR == 1
-                printf("%d  ", p->res[i * p->c2 + j]);
-            #else
-                printf("%d  ", p->res[j * p->r1 + i]);
-            #endif
+            printf("%d  ", p->res[i * p->c2 + j]);      /* Row major ordering */
         }
         printf("\n");
     }
@@ -148,20 +136,6 @@ void printToFile (struct inputPair *p){
  * detected or EOF.
  */
 void produceInputPair(char* file, int nCons){
-    /*
-     * Input file format:
-     * # rows in 1st matrix, # columns in 1st matrix, # rows in 2nd matrix, # columns in 2nd matrix
-     * row 1 of 1st matrix space seperated
-     *  ...
-     * row n of 1st matrix space seperated
-     * \n
-     * row 1 of 2nd matrix space seperated
-     *  ...
-     * row n of 2nd matrix space seperated
-     * \n
-     * This pattern can be repeated any amount of times within the file, but is limited by
-     * the size of MAX_LINE_SIZE.
-     */
     FILE* file;
     file = fopen(file,"r");
     b.fileIn = file;
@@ -230,11 +204,7 @@ void produceInputPair(char* file, int nCons){
                         printf("Invalid matrix specifications.\n");
                         exit(1);
                     }
-                    #if ROW_MAJOR == 1
-                        p->m1[i * p->c1 + j] = atoi(temp);
-                    #else
-                        p->m1[j * p->r1 + i] = atoi(temp);
-                    #endif
+                    p->m1[i * p->c1 + j] = atoi(temp);
                     temp = strtok(NULL, " ");
                 }
 
@@ -255,7 +225,7 @@ void produceInputPair(char* file, int nCons){
 
                 // Check if row fits in input buffer.
                 if (strchr(line, '\n') == NULL) {
-                    printf("Matrix 1 row %d does not fit input buffer. Increase input buffer size or check input dimension.\n", i + 1);
+                    printf("Matrix 2 row %d does not fit input buffer. Increase input buffer size or check input dimension.\n", i + 1);
                     exit(1);
                 }
 
@@ -266,11 +236,7 @@ void produceInputPair(char* file, int nCons){
                         printf("Invalid matrix specifications.\n");
                         exit(1);
                     }
-                    #if ROW_MAJOR == 1
-                        p->m2[i * p->c2 + j] = atoi(temp);
-                    #else
-                        p->m2[j * p->r2 + i] = atoi(temp);
-                    #endif
+                    p->m2[j * p->r2 + i] = atoi(temp);
                     temp = strtok(NULL, " ");
                 }
 
@@ -327,16 +293,7 @@ void *consumeInputPair(void *cons_num){
 /* Call this function with command lines inputs of input file and number of consumers/threads
  * wanted to preform multiplication.
  */
-void startMultiM(int argc, char **argv){
-    // Check args.
-    if (argc != 3) {
-        printf("Invalid number of arguments.");
-        exit(1);
-    }
-
-    int nCon, nPro = 1;
-    if (argv < 0) nCon = argv[2];
-
+void startMultiM(int nCon, char *fileName){
     bufferInit();
 
     pthread_t *cons = (pthread_t *)alloca(nCon * sizeof(pthread_t));
@@ -347,7 +304,7 @@ void startMultiM(int argc, char **argv){
     }
 
     // Start producer thread (runs on main thread).
-    produceInputPair(argv[1], nCon);
+    produceInputPair(fileName, nCon);
 
     // Clean up.
     for (int i = 0; i<nCon; i++){
@@ -363,6 +320,15 @@ void startMultiM(int argc, char **argv){
  * must be integer matricies.
  */
 int main(int argc, char **argv) {
-    startMultiM(argc, argv);
+    // Check args.
+    if (argc != 3) {
+        printf("Invalid number of arguments.");
+        exit(1);
+    }
+
+    int nCon, nPro = 1;
+    if (argv < 0) nCon = argv[2];
+
+    startMultiM(nCon, argv[1]);
     return 0;
 }

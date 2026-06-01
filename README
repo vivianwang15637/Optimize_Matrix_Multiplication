@@ -1,0 +1,28 @@
+# Somewhat Optimized Matrix Multiplication Library
+This project aims to decrease the execution time of multiple independent matrix multiplication operations using pthreads and CUDA to parallelize the execution of these operations. 
+
+
+## Usage of pthread.h library
+This implementation uses pthreads to parallelize the execution of processing each input pair of matricies using the producer and consumer pattern. Since input is recieved from a file, there is 1 producer that will parse inputs from the file to be definied as an inputPair struct type containing all nessescary data needed to complete the operation. These inputPairs are put into a shared buffer as tasks for consumers to execute. The number of consumers is defined by the user.
+
+## CUDA kernel
+
+
+## File input requirements
+Input file format:
+    # rows in 1st matrix, # columns in 1st matrix, # rows in 2nd matrix, # columns in 2nd matrix\n
+    row 1 of 1st matrix space seperated\n
+    ...
+    row n of 1st matrix space seperated\n
+    \n
+    row 1 of 2nd matrix space seperated\n
+    ...
+    row n of 2nd matrix space seperated\n
+    \n
+This pattern can be repeated any amount of times within the file, but is limited by the size of MAX_LINE_SIZE.
+
+## Macros definied in header file
+    #define BUFFER_SIZE ...
+        - "task" queue for operations, adjust based on 
+    #define MAX_LINE_SIZE ...
+        - MAX_LINE_SIZE - 1 is the amount of characters that will 
