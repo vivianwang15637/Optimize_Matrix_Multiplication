@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <alloca.h>
+#include <assert.h>
 #include <pthread.h>
 
 #define BUFFER_SIZE 10
@@ -28,12 +29,10 @@ struct buffer{
    pthread_cond_t not_empty;
 };
 
-struct buffer b;
-
 /* Buffer functions */
-void bufferInit();
+void bufferInit(void);
 void bufferAdd(struct inputPair *p);
-struct inputPair* bufferTake();
+struct inputPair* bufferTake(void);
 
 /* Placeholder function for CUDA kernel */
 void multiM(struct inputPair *p);

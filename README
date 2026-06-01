@@ -23,6 +23,6 @@ This pattern can be repeated any amount of times within the file, but is limited
 
 ## Macros definied in header file
     #define BUFFER_SIZE ...
-        - "task" queue for operations, adjust based on 
+        - "task" queue for operations
     #define MAX_LINE_SIZE ...
-        - MAX_LINE_SIZE - 1 is the amount of characters that will 
+        - MAX_LINE_SIZE - 1 is the amount of characters that will be read from the file

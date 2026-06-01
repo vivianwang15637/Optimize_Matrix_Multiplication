@@ -1,11 +1,13 @@
 #include "opti_matrix_multi.h"
 
+struct buffer b;
+
 /* TODO:Stencil kernal to multiply two matrices of any compatible size */
-void multiM(struct inputPair p) {
+void multiM(struct inputPair *p) {
     // Placeholder 3-loop matrix multiplication logic
-    for (int i = 0; i < r1; ++i) {
-        for (int j = 0; j < c2; ++j) {
-            for (int k = 0; k < c1; ++k) {
+    for (int i = 0; i < p->r1; ++i) {
+        for (int j = 0; j < p->c2; ++j) {
+            for (int k = 0; k < p->c1; ++k) {
                 //p->res[i * p->c2 + j] += p->m1[i * p->c1 + k] * p->m2[k * p->c2 + j];
             }
         }
@@ -14,10 +16,10 @@ void multiM(struct inputPair p) {
 }
 
 /* Initilize buffer status variables, mutex lock, and condition variables. */
-void bufferInit(){
-    struct b.in = 0;
-    struct b.out = 0;
-    struct b.count = 0;
+void bufferInit(void){
+    b.in = 0;
+    b.out = 0;
+    b.count = 0;
     pthread_mutex_init(&b.buf_m,NULL);
     pthread_mutex_init(&b.print_m,NULL);
     pthread_cond_init(&b.not_full,NULL);
@@ -47,7 +49,7 @@ void bufferAdd(struct inputPair *p){
 }
 
 /* Removes inputPair from buffer if possible. Returns pointer to pair for processing. */
-struct inputPair* bufferTake(){
+struct inputPair* bufferTake(void){
     // Lock for access to buffer
     pthread_mutex_lock(&b.buf_m);
 
@@ -130,15 +132,14 @@ void printToFile (struct inputPair *p){
 /* Parse through input files and add inputPairs into the buffer until invalid inputPair 
  * detected or EOF.
  */
-void produceInputPair(char* file, int nCons){
+void produceInputPair(char* inputFileName, int nCons){
     FILE* file;
-    file = fopen(file,"r");
-    b.fileIn = file;
-
-    if (ptr == NULL) {
-        printf("%s is not a valid input.\n", argv[1]);
+    file = fopen(inputFileName,"r");
+    if (file == NULL) {
+        printf("%s is not a valid input.\n", inputFileName);
         exit(1);
     }
+    b.fileIn = inputFileName;
 
     char line[MAX_LINE_SIZE];
 
@@ -146,38 +147,30 @@ void produceInputPair(char* file, int nCons){
     while(fgets(line, MAX_LINE_SIZE, stdin) != NULL){
         struct inputPair *p = malloc(sizeof(struct inputPair));
 
-        
         // Get and set row and column size for input matricies.
         char *tkn = strtok(line, ", ");
-        if (tkn == NULL) {
-            printf("Invalid matrix specification.\n");
-            exit(1);
-        }
-        p->r1 = atoi(tkn);
+        for (int i = 0; i < 4; i++){
+            if (tkn == NULL) {
+                printf("Invalid matrix specification.\n");
+                exit(1);
+            }
 
-        tkn = strtok(NULL, ", ");
-        if (tkn == NULL) {
-            printf("Invalid matrix specification.\n");
-            exit(1);
-        }
-        p->c1 = atoi(tkn);
+            switch(i) {
+                case 0:
+                    p->r1 = atoi(tkn);
+                case 1:
+                    p->c1 = atoi(tkn);
+                case 2:
+                    p->r2 = atoi(tkn);
+                case 3:
+                    p->c2 = atoi(tkn);
+                    if (p->c1 != p->r2) {
+                        printf("Error: Invalid input(s) detected. Column of first matrix must equal row of second.\n");
+                        exit(1);
+                    }
+            }
 
-        tkn = strtok(NULL, ", ");
-        if (tkn == NULL) {
-            printf("Invalid matrix specification.\n");
-            exit(1);
-        }
-        p->r2 = atoi(tkn);
-
-        tkn = strtok(NULL, ", ");
-        if (tkn == NULL) {
-            printf("Invalid matrix specification.\n");
-            exit(1);
-        }
-        p->c2 = atoi(tkn);
-        if (p->c1 != p->r2) {
-            printf("Error: Invalid input(s) detected. Column of first matrix must equal row of second.\n");
-            exit(1);
+            tkn = strtok(NULL, ", ");
         }
 
         // Parse matrix 1.
@@ -208,8 +201,9 @@ void produceInputPair(char* file, int nCons){
 
         // Check if column matches input dimension.
         fgets(line, MAX_LINE_SIZE, stdin);
-        if (strcmp(line,"\n")) {
+        if (!strcmp(line,"\n")) {
             printf("Input matrix 1 does not match the expected dimensions\n");
+            exit(1);
         }
 
         // Parse matrix 2.
@@ -240,8 +234,9 @@ void produceInputPair(char* file, int nCons){
 
         // Check if column matches input dimension.
         fgets(line, MAX_LINE_SIZE, stdin);
-        if (strcmp(line,"\n")) {
+        if (!strcmp(line,"\n")) {
             printf("Input matrix 2 does not match the expected dimensions\n");
+            exit(1);
         }
 
         // Make result matrix.
@@ -253,9 +248,9 @@ void produceInputPair(char* file, int nCons){
     }
 
     // Add termination signal for each consumer into buffer.
-    struct inputPair *term = malloc(sizeof(inputPair));
+    struct inputPair *term = malloc(sizeof(struct inputPair));
     term->r1 = -1;
-    for (int i = 0; i < nCons < i++) bufferAdd(term);
+    for (int i = 0; i < nCons; i++) bufferAdd(term);
 
 }
 
@@ -321,7 +316,7 @@ int main(int argc, char **argv) {
     }
 
     int nCon, nPro = 1;
-    if (argv < 0) nCon = argv[2];
+    if (atoi(argv[2]) < 0) nCon = atoi(argv[2]);
 
     startMultiM(nCon, argv[1]);
     return 0;
