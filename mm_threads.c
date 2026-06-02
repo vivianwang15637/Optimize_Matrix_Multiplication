@@ -163,6 +163,8 @@ void produceInputPair(char* inputFileName, int nCons){
     // Read file by operation inputs until invalid matrix or EOF.
     while(fgets(line, MAX_LINE_SIZE, stdin) != NULL){
         printf("produceInputPair read file");
+        printf("%s\n",line);
+
         struct inputPair *p = malloc(sizeof(struct inputPair));
 
         // Get and set row and column size for input matricies.
@@ -196,6 +198,7 @@ void produceInputPair(char* inputFileName, int nCons){
         for (int i = 0; i < p->r1; i++){
             // Get a row.
             if (fgets(line, MAX_LINE_SIZE, stdin) != NULL){
+        printf("%s\n",line);
 
                 // Check if row fits in input buffer.
                 if (strchr(line, '\n') == NULL) {
@@ -220,6 +223,8 @@ void produceInputPair(char* inputFileName, int nCons){
 
         // Check if column matches input dimension.
         fgets(line, MAX_LINE_SIZE, stdin);
+                printf("%s\n",line);
+
         if (!strcmp(line,"\n")) {
             printf("Input matrix 1 does not match the expected dimensions\n");
             exit(1);
@@ -230,6 +235,7 @@ void produceInputPair(char* inputFileName, int nCons){
         for (int i = 0; i < p->r2; i++){
             // Get a row.
             if (fgets(line, MAX_LINE_SIZE, stdin) != NULL){
+        printf("%s\n",line);
 
                 // Check if row fits in input buffer.
                 if (strchr(line, '\n') == NULL) {
@@ -254,6 +260,10 @@ void produceInputPair(char* inputFileName, int nCons){
 
         // Check if column matches input dimension.
         fgets(line, MAX_LINE_SIZE, stdin);
+
+        printf("%s\n",line);
+
+
         if (!strcmp(line,"\n")) {
             printf("Input matrix 2 does not match the expected dimensions\n");
             exit(1);
@@ -312,6 +322,7 @@ void startMultiM(int nCon, char *fileName){
     // Spawn consumer threads.
     for (int i = 0; i < nCon; i++){
         int t = pthread_create(&cons[i], NULL, consumeInputPair, (void *)(intptr_t)i);
+        printf("thread created");
         assert(t == 0);
     }
 
