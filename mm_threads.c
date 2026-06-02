@@ -263,7 +263,11 @@ void produceInputPair(char* inputFileName, int nCons){
        printf("produceInputPair read matrix 2");
 
         // Check if column matches input dimension.
-        if (fgets(line, MAX_LINE_SIZE, file) == NULL || strcmp(line,"\n")) {
+        printf("LAST GET: [%s] len=%zu\n", line, strlen(line));
+        fgets(line, MAX_LINE_SIZE, file);
+        printf("SHOULD BE EMPTY LINE: [%s] len=%zu\n", line, strlen(line));
+
+        if (strcmp(line,"\n")) {
             printf("Input matrix 2 does not match the expected dimensions\n");
             exit(1);
         }
