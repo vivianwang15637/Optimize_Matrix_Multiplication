@@ -263,15 +263,11 @@ void produceInputPair(char* inputFileName, int nCons){
        printf("produceInputPair read matrix 2");
 
         // Check if column matches input dimension.
-        fgets(line, MAX_LINE_SIZE, file);
-
-        printf("%s\n",line);
-
-
-        if (strcmp(line,"\n")) {
+        if (fgets(line, MAX_LINE_SIZE, file) == NULL || strcmp(line,"\n")) {
             printf("Input matrix 2 does not match the expected dimensions\n");
             exit(1);
         }
+        printf("%s\n",line);
 
         // Make result matrix.
         p->res = (int *)malloc(p->r1 * p->c2 * sizeof(int));
@@ -279,7 +275,6 @@ void produceInputPair(char* inputFileName, int nCons){
         // Add inputPair to buffer.
         bufferAdd(p);
         printf("produceInputPair added to buffer");
-
 
     }
 
