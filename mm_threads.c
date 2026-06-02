@@ -161,7 +161,7 @@ void produceInputPair(char* inputFileName, int nCons){
     char line[MAX_LINE_SIZE];
 
     // Read file by operation inputs until invalid matrix or EOF.
-    while(fgets(line, MAX_LINE_SIZE, stdin) != NULL){
+    while(fgets(line, MAX_LINE_SIZE, file) != NULL){
         printf("produceInputPair read file");
         printf("%s\n",line);
 
@@ -178,16 +178,20 @@ void produceInputPair(char* inputFileName, int nCons){
             switch(i) {
                 case 0:
                     p->r1 = atoi(tkn);
+                    break;
                 case 1:
                     p->c1 = atoi(tkn);
+                    break;
                 case 2:
                     p->r2 = atoi(tkn);
+                    break;
                 case 3:
                     p->c2 = atoi(tkn);
                     if (p->c1 != p->r2) {
                         printf("Error: Invalid input(s) detected. Column of first matrix must equal row of second.\n");
                         exit(1);
                     }
+                    break;
             }
 
             tkn = strtok(NULL, ", ");
@@ -197,7 +201,7 @@ void produceInputPair(char* inputFileName, int nCons){
         p->m1 = (int *)malloc(p->r1 * p->c1 * sizeof(int));
         for (int i = 0; i < p->r1; i++){
             // Get a row.
-            if (fgets(line, MAX_LINE_SIZE, stdin) != NULL){
+            if (fgets(line, MAX_LINE_SIZE, file) != NULL){
         printf("%s\n",line);
 
                 // Check if row fits in input buffer.
@@ -222,7 +226,7 @@ void produceInputPair(char* inputFileName, int nCons){
        printf("produceInputPair read matrix 1");
 
         // Check if column matches input dimension.
-        fgets(line, MAX_LINE_SIZE, stdin);
+        fgets(line, MAX_LINE_SIZE, file);
                 printf("%s\n",line);
 
         if (!strcmp(line,"\n")) {
@@ -234,7 +238,7 @@ void produceInputPair(char* inputFileName, int nCons){
         p->m2 = (int *)malloc(p->r2 * p->c2 * sizeof(int));
         for (int i = 0; i < p->r2; i++){
             // Get a row.
-            if (fgets(line, MAX_LINE_SIZE, stdin) != NULL){
+            if (fgets(line, MAX_LINE_SIZE, file) != NULL){
         printf("%s\n",line);
 
                 // Check if row fits in input buffer.
@@ -259,7 +263,7 @@ void produceInputPair(char* inputFileName, int nCons){
        printf("produceInputPair read matrix 2");
 
         // Check if column matches input dimension.
-        fgets(line, MAX_LINE_SIZE, stdin);
+        fgets(line, MAX_LINE_SIZE, file);
 
         printf("%s\n",line);
 
@@ -351,7 +355,7 @@ int main(int argc, char **argv) {
     }
 
     int nCon, nPro = 1;
-    if (atoi(argv[2]) < 0) nCon = atoi(argv[2]);
+   if (atoi(argv[2]) > 0) nCon = atoi(argv[2]);
 
     startMultiM(nCon, argv[1]);
     return 0;
