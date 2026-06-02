@@ -84,26 +84,22 @@ struct inputPair* bufferTake(void){
 
 /* Free all memory allocated for inputPair. */
 void freeInputPair(struct inputPair *p){
-     if (p != NULL){
-        return NULL;
-    }
-
-    if (p->m1 != NULL){
-        free(p->m1);
-        p->m1 = NULL;
-    }
-
-    if (p->m2 != NULL){
-        free(p->m2);
-        p->m2 = NULL;
-    }
-
-    if (p->res != NULL){
-        free(p->res);
-        p->res = NULL;
-    }
-
     if (p != NULL){
+        if (p->m1 != NULL){
+            free(p->m1);
+            p->m1 = NULL;
+        }
+
+        if (p->m2 != NULL){
+            free(p->m2);
+            p->m2 = NULL;
+        }
+
+        if (p->res != NULL){
+            free(p->res);
+            p->res = NULL;
+        }
+
         free(p);
         p = NULL;
     }
