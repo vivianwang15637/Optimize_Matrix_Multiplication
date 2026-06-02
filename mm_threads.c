@@ -84,6 +84,10 @@ struct inputPair* bufferTake(void){
 
 /* Free all memory allocated for inputPair. */
 void freeInputPair(struct inputPair *p){
+     if (p != NULL){
+        return NULL;
+    }
+
     if (p->m1 != NULL){
         free(p->m1);
         p->m1 = NULL;
@@ -229,7 +233,7 @@ void produceInputPair(char* inputFileName, int nCons){
         fgets(line, MAX_LINE_SIZE, file);
                 printf("%s\n",line);
 
-        if (!strcmp(line,"\n")) {
+        if (strcmp(line,"\n")) {
             printf("Input matrix 1 does not match the expected dimensions\n");
             exit(1);
         }
@@ -268,7 +272,7 @@ void produceInputPair(char* inputFileName, int nCons){
         printf("%s\n",line);
 
 
-        if (!strcmp(line,"\n")) {
+        if (strcmp(line,"\n")) {
             printf("Input matrix 2 does not match the expected dimensions\n");
             exit(1);
         }
