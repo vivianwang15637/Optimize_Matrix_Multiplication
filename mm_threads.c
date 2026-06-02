@@ -32,6 +32,8 @@ void bufferInit(void){
 void bufferAdd(struct inputPair *p){
     // Lock for access to buffer
     pthread_mutex_lock(&b.buf_m);
+    printf("bufferTake initiated");
+
 
     // Check & wait while buffer is full
     while(b.count == BUFFER_SIZE) pthread_cond_wait(&b.not_full, &b.buf_m);
@@ -48,12 +50,15 @@ void bufferAdd(struct inputPair *p){
 		pthread_cond_signal(&b.not_empty);
 	}
 	pthread_mutex_unlock(&b.buf_m);
+    printf("bufferTake succuessful");
+
 }
 
 /* Removes inputPair from buffer if possible. Returns pointer to pair for processing. */
 struct inputPair* bufferTake(void){
     // Lock for access to buffer
     pthread_mutex_lock(&b.buf_m);
+    printf("bufferTake inititiated");
 
     // Check & wait while buffer is empty
     while(b.count == 0) pthread_cond_wait(&b.not_empty, &b.buf_m);
@@ -71,6 +76,7 @@ struct inputPair* bufferTake(void){
 		pthread_cond_signal(&b.not_full);
 	}
 	pthread_mutex_unlock(&b.buf_m);
+    printf("bufferTake succuessful");
 
     return b_out;
 
@@ -142,6 +148,8 @@ void printToFile (struct inputPair *p){
  * detected or EOF.
  */
 void produceInputPair(char* inputFileName, int nCons){
+    printf("produceInputPair started");
+
     FILE* file;
     file = fopen(inputFileName,"r");
     if (file == NULL) {
@@ -154,6 +162,7 @@ void produceInputPair(char* inputFileName, int nCons){
 
     // Read file by operation inputs until invalid matrix or EOF.
     while(fgets(line, MAX_LINE_SIZE, stdin) != NULL){
+        printf("produceInputPair read file");
         struct inputPair *p = malloc(sizeof(struct inputPair));
 
         // Get and set row and column size for input matricies.
@@ -207,6 +216,7 @@ void produceInputPair(char* inputFileName, int nCons){
 
             }
         }
+       printf("produceInputPair read matrix 1");
 
         // Check if column matches input dimension.
         fgets(line, MAX_LINE_SIZE, stdin);
@@ -240,6 +250,7 @@ void produceInputPair(char* inputFileName, int nCons){
 
             }
         }
+       printf("produceInputPair read matrix 2");
 
         // Check if column matches input dimension.
         fgets(line, MAX_LINE_SIZE, stdin);
@@ -253,6 +264,8 @@ void produceInputPair(char* inputFileName, int nCons){
 
         // Add inputPair to buffer.
         bufferAdd(p);
+        printf("produceInputPair added to buffer");
+
 
     }
 
@@ -260,12 +273,14 @@ void produceInputPair(char* inputFileName, int nCons){
     struct inputPair *term = malloc(sizeof(struct inputPair));
     term->r1 = -1;
     for (int i = 0; i < nCons; i++) bufferAdd(term);
+    printf("produceInputPair finished");
 
 }
 
 /* Consume inputPairs from the shared buffer until the termination signal is recieved. */
 void *consumeInputPair(void *cons_num){
     while (1){
+        printf("consumeInputPair started");
         // Remove an inputPair from shared buffer.
         struct inputPair *p;
         p = bufferTake();
@@ -281,6 +296,8 @@ void *consumeInputPair(void *cons_num){
 
         // Free memory
         freeInputPair(p);
+        printf("consumeInputPair consumed");
+
     }
         return(NULL);
 }
@@ -290,7 +307,7 @@ void *consumeInputPair(void *cons_num){
  */
 void startMultiM(int nCon, char *fileName){
     bufferInit();
-
+    printf("startMultiM called");
     pthread_t *cons = (pthread_t *)alloca(nCon * sizeof(pthread_t));
     // Spawn consumer threads.
     for (int i = 0; i < nCon; i++){
@@ -306,6 +323,7 @@ void startMultiM(int nCon, char *fileName){
         int t = pthread_join(cons[i], NULL);
         assert(t == 0);
     }
+    printf("startMultiM finished");
 }
 
 /*
