@@ -7,9 +7,11 @@ void multiM(struct inputPair *p) {
     // Placeholder 3-loop matrix multiplication logic
     for (int i = 0; i < p->r1; ++i) {
         for (int j = 0; j < p->c2; ++j) {
+            int sum = 0;
             for (int k = 0; k < p->c1; ++k) {
-                //p->res[i * p->c2 + j] += p->m1[i * p->c1 + k] * p->m2[k * p->c2 + j];
+                sum += p->m1[i * p->c1 + k] * p->m2[k * p->c2 + j];
             }
+             p->res[i * p->c2 + j] = sum;
         }
     }
 
@@ -271,11 +273,8 @@ void *consumeInputPair(void *cons_num){
         // Check that an operation can be done.
         if(p->r1 == -1) return(NULL);
 
-        // Allocate device resources.
-        printf("Device resource allocation");
-        // Call stencil kernel.
-        printf("Call Kernel");
-
+        // Perform multiplication.
+        multiM(p);
 
         // Display inputs and result.
         printToFile(p);
