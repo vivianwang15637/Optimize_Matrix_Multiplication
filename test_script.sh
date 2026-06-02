@@ -13,7 +13,7 @@ do
         do
             #Run the program
             echo "Running with $consumers consumer(s):"
-            ./MM_Threads "$input" "$consumers"
+            time ./MM_Threads "$input" "$consumers"
             echo "-------------------------------------"
         done
         echo "====================================="
