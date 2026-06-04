@@ -13,7 +13,13 @@ do
         do
             #Run the program
             echo "Running with $consumers consumer(s):"
-            time ./MM_Threads "$input" "$consumers"
+	    start_dec=$EPOCHREALTIME
+            ./MM_Threads "$input" "$consumers"
+            end_dec=$EPOCHREALTIME
+            start=${start_dec/./}
+            end=${end_dec/./}
+            diff=$((end-start))
+            echo -e "\nExecution time: $diff ms"
             echo "-------------------------------------"
         done
         echo "====================================="
