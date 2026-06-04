@@ -42,7 +42,7 @@ void produceInputPair(char* file, int nCons);
 void *consumeInputPair(void *cons_num);
 
 /* Consumer specific functions */
-void freeInputPair(struct inputPair *p);
+void freeInputPair(struct inputPair **p);
 void printToFile (struct inputPair *p);
 
 void startMultiM(int nCon, char *fileName);
