@@ -9,7 +9,7 @@
 #include <pthread.h>
 
 #define BUFFER_SIZE 10
-#define MAX_LINE_SIZE 300
+#define MAX_LINE_SIZE 9000
 
 struct inputPair{
     int r1,c1,r2,c2;

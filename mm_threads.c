@@ -150,8 +150,6 @@ void printToFile (struct inputPair *p){
  * detected or EOF.
  */
 void produceInputPair(char* inputFileName, int nCons){
-    printf("produceInputPair started\n");
-
     FILE* file;
     file = fopen(inputFileName,"r");
     if (file == NULL) {
@@ -262,7 +260,7 @@ void produceInputPair(char* inputFileName, int nCons){
        // Check if column matches input dimension.
         memset(line,'\0',sizeof(line));
         if (fgets(line, MAX_LINE_SIZE, file) != NULL && line[0] != '\n') {
-            printf("SHOULD BE EMPTY LINE: [%d] len=%zu\n", line[0], strlen(line));
+            printf("SHOULD BE EMPTY LINE: [%s] len=%zu\n", line, strlen(line));
             printf("Input matrix 2 does not match the expected dimensions\n");
             exit(1);
         }
@@ -272,8 +270,6 @@ void produceInputPair(char* inputFileName, int nCons){
 
         // Add inputPair to buffer.
         bufferAdd(p);
-        printf("produceInputPair added to buffer\n");
-
     }
 
     fclose(file);
@@ -285,13 +281,11 @@ void produceInputPair(char* inputFileName, int nCons){
         term->m1,term->m2,term->res = NULL;
         bufferAdd(term);
     }
-    printf("produceInputPair finished\n");
 
 }
 
 /* Consume inputPairs from the shared buffer until the termination signal is recieved. */
 void *consumeInputPair(void *cons_num){
-    printf("Consumer %d started", (int)(intptr_t)cons_num);
     while (1){
         // Remove an inputPair from shared buffer.
         struct inputPair *p;
@@ -300,7 +294,7 @@ void *consumeInputPair(void *cons_num){
         // Check that an operation can be done.
         if(p->r1 == -1){
             freeInputPair(&p);
-            printf("Consumer %d exited", (int)(intptr_t)cons_num);
+            //printf("Consumer %d exited", (int)(intptr_t)cons_num);
             return (NULL);
         }
 
@@ -312,8 +306,6 @@ void *consumeInputPair(void *cons_num){
 
         // Free memory
         freeInputPair(&p);
-        printf("consumeInputPair consumed\n");
-
     }
         return(NULL);
 }
@@ -323,7 +315,6 @@ void *consumeInputPair(void *cons_num){
  */
 void startMultiM(int nCon, char *fileName){
     bufferInit();
-    printf("startMultiM called");
     pthread_t *cons = (pthread_t *)alloca(nCon * sizeof(pthread_t));
     // Spawn consumer threads.
     for (int i = 0; i < nCon; i++){
@@ -341,7 +332,6 @@ void startMultiM(int nCon, char *fileName){
 	printf("thread[%d] joined",i);
         assert(t == 0);
     }
-    printf("startMultiM finished");
 }
 
 /*
