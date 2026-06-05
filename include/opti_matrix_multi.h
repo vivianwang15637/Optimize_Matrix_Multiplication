@@ -20,6 +20,7 @@ struct inputPair{
 
 struct buffer{
    char *fileIn;
+   int nCons;
    struct inputPair *buf[BUFFER_SIZE];	    // Shared input stream for consumer threads.
    int in;	                				// Index for next insertion.
    int out;					                // Index for next deletion.
@@ -38,7 +39,7 @@ struct inputPair* bufferTake(void);
 /* Placeholder function for CUDA kernel */
 void multiM(struct inputPair *p);
 
-void produceInputPair(char* file, int nCons);
+void produceInputPair(char* file);
 void *consumeInputPair(void *cons_num);
 
 /* Consumer specific functions */

@@ -93,7 +93,15 @@ void freeInputPair(struct inputPair *p){
 /* Print resulting matrix and corresponding inputs */
 void printToFile (struct inputPair *p){
     pthread_mutex_lock(&b.print_m);
-    char *outFile = strncat(outFile, b.fileIn, 10);
+
+    // Create file to put output
+    char outFile[MAX_LINE_SIZE];
+    char str[10];
+    strncpy(outFile, b.fileIn, MAX_LINE_SIZE -11);
+    snprintf(str, sizeof(str), "%d", b.nCons);
+    strncat(outFile, str, 10);
+    strncat(outFile, "_cuda_out.txt", 13);
+
     FILE *fp = fopen(outFile, "a");
     if (fp == NULL) {
         printf("Error: Could not open file.\n");
@@ -132,7 +140,7 @@ void printToFile (struct inputPair *p){
 /* Parse through input files and add inputPairs into the buffer until invalid inputPair 
  * detected or EOF.
  */
-void produceInputPair(char* inputFileName, int nCons){
+void produceInputPair(char* inputFileName){
     FILE* file;
     file = fopen(inputFileName,"r");
     if (file == NULL) {
@@ -247,10 +255,17 @@ void produceInputPair(char* inputFileName, int nCons){
 
     }
 
+    fclose(file);
+
     // Add termination signal for each consumer into buffer.
-    struct inputPair *term = malloc(sizeof(struct inputPair));
-    term->r1 = -1;
-    for (int i = 0; i < nCons; i++) bufferAdd(term);
+    for (int i = 0; i < b.nCons; i++){
+        struct inputPair *term = malloc(sizeof(struct inputPair));
+        term->r1 = -1;
+        term->m1 = NULL;
+        term->m2=  NULL;
+        term->res = NULL;
+        bufferAdd(term);
+    }
 
 }
 
@@ -282,6 +297,7 @@ void *consumeInputPair(void *cons_num){
  */
 void startMultiM(int nCon, char *fileName){
     bufferInit();
+    b.nCons = nCon;
 
     pthread_t *cons = (pthread_t *)alloca(nCon * sizeof(pthread_t));
     // Spawn consumer threads.
@@ -291,7 +307,7 @@ void startMultiM(int nCon, char *fileName){
     }
 
     // Start producer thread (runs on main thread).
-    produceInputPair(fileName, nCon);
+    produceInputPair(fileName);
 
     // Clean up.
     for (int i = 0; i<nCon; i++){
