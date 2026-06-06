@@ -5,8 +5,10 @@
 .LSOverride
 
 src/*.o
+src/only_threads/*.o
+tests/*.o
 
 make/MM_Threads
 make/MM_CUDA
 
-tests/output/
+tests/cases/output/

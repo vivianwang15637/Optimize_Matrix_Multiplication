@@ -1,10 +1,11 @@
 #!/bin/bash
 
+cd ../make
 make MM_Threads
 echo "====================================="
 
 #Run the program with test cases
-for input in ../tests/test_1_smalls.txt ../tests/test_few_larges.txt ../tests/test_many_smalls.txt ../tests/test_many_larges.txt
+for input in ../tests/cases/test_1_smalls.txt ../tests/cases/test_few_larges.txt ../tests/cases/test_many_smalls.txt ../tests/cases/test_many_larges.txt
 do
         echo "Running MM_Threads with $input"
         echo "====================================="
@@ -28,8 +29,8 @@ do
         echo "====================================="
 done
 
-mkdir -p ../tests/output
-mv ../tests/*_out.txt ../tests/output/
+mkdir -p ../tests/cases/output
+mv ../tests/cases/*_out.txt ../tests/cases/output/
 
 
 

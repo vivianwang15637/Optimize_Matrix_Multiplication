@@ -1,17 +1,30 @@
-FLAGS := -std=c99 -pthread -pedantic -Wimplicit-function-declaration -Wreturn-type -Wformat -g -I../include
-TH_DIR := ../src/
-CU_DIR := ../src/cuda/
+# Compilation specifics
+CC := clang
+FLAGS = -std=c99 -pthread -pedantic -Wimplicit-function-declaration -Wreturn-type -Wformat -g -I$(INC_DIR)
+
+# File directories
+INC_DIR := ../include/
+SRC_DIR := ../src/
+SRC_PT_DIR := $(SRC_DIR)/only_threads/
+SRC_CU_DIR := $(SRC_DIR)/cuda/
+TEST_DIR := ../tests/
 
 all: MM_Threads
 
-MM_Threads: $(TH_DIR)mm_threads.o
-	clang -o MM_Threads $(TH_DIR)mm_threads.o
+MM_Threads: $(SRC_DIR)mm_shared_funcs.o $(SRC_PT_DIR)mm_threads.o $(TEST_DIR)run_mm_threads_implementation.o
+	$(CC) -o MM_Threads $(SRC_DIR)mm_shared_funcs.o $(SRC_PT_DIR)mm_threads.o $(TEST_DIR)run_mm_threads_implementation.o
 
-$(TH_DIR)mm_threads.o: $(TH_DIR)mm_threads.c ../include/opti_matrix_multi.h
-	clang $(FLAGS) -c $(TH_DIR)mm_threads.c -o $(TH_DIR)mm_threads.o
+$(SRC_DIR)mm_shared_funcs.o: $(SRC_DIR)mm_shared_funcs.c $(INC_DIR)opti_matrix_multi.h
+	$(CC) $(FLAGS) -c $(SRC_DIR)mm_shared_funcs.c -o $(SRC_DIR)mm_shared_funcs.o
 
-MM_CUDA: $(CU_DIR)mm_opti.cu $(INC_DIR)opti_matrix_multi.h
-	nvcc -Xcompiler "$(FLAGS)" $(CU_DIR)mm_opti.cu -o MM_CUDA
+$(SRC_PT_DIR)mm_threads.o: $(SRC_PT_DIR)mm_threads.c $(INC_DIR)opti_matrix_multi.h
+	$(CC) $(FLAGS) -c $(SRC_PT_DIR)mm_threads.c -o $(SRC_PT_DIR)mm_threads.o
+
+$(TEST_DIR)run_mm_threads_implementation.o: $(TEST_DIR)run_mm_threads_implementation.c $(INC_DIR)opti_matrix_multi.h
+	$(CC) $(FLAGS) -c $(TEST_DIR)run_mm_threads_implementation.c -o $(TEST_DIR)run_mm_threads_implementation.o
+
+MM_CUDA: $(SRC_CU_DIR)mm_opti.cu $(INC_DIR)opti_matrix_multi.h
+	nvcc -Xcompiler "$(FLAGS)" $(SRC_CU_DIR)mm_opti.cu -o MM_CUDA
 
 clean:
-	rm -rf $(TH_DIR)*.o ../tests/output/*_out.txt MM_Threads
+	rm -rf $(SRC_DIR)*.o $(SRC_PT_DIR)*.o $(TEST_DIR)*.o ../tests/cases/output/*_out.txt MM_Threads
