@@ -10,6 +10,10 @@
 
 #define BUFFER_SIZE 10
 #define MAX_LINE_SIZE 9000
+#ifdef __CUDACC__
+    /* # of threads per block.  */
+    #define TILE_SIZE 32
+#endif
 
 struct inputPair{
     int r1,c1,r2,c2;
@@ -31,21 +35,11 @@ struct buffer{
    pthread_cond_t not_empty;
 };
 
-/* Buffer functions */
-void bufferInit(void);
-void bufferAdd(struct inputPair *p);
-struct inputPair* bufferTake(void);
-
-/* Placeholder function for CUDA kernel */
-void multiM(struct inputPair *p);
-
-void produceInputPair(char* file);
-void *consumeInputPair(void *cons_num);
-
-/* Consumer specific functions */
-void freeInputPair(struct inputPair **p);
-void printToFile (struct inputPair *p);
+struct consumerParams {
+    struct buffer *b;
+    int id;
+};
 
 void startMultiM(int nCon, char *fileName);
 
-# endif
+#endif
